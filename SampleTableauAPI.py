@@ -45,7 +45,12 @@ engine = create_engine(connection_string)
 table_name = 'your_table_name'
 
 df.to_sql(table_name, engine, if_exists='append', index=False, method='multi', chunksize=1000)
-
+##################################################################
+##################################################################
+##################################################################
+##################################################################
+##################################################################
+##################################################################
 import tableauserverclient as TSC
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
@@ -67,3 +72,55 @@ with server.auth.sign_in_with_http_auth(site_id=site_id, auth=kerberos_auth):
         print(workbook.name)
 
 # Remember to replace 'your-tableau-server' and 'your_site_id' with your actual server and site ID.
+########################################
+########################################
+########################################
+########################################
+########################################
+import tableauserverclient as TSC
+
+def tableau_list_workbooks_in_project(server_url, site_id, token_name, token_value, project_name):
+    try:
+        # Configure authentication with the personal access token
+        personal_access_token_auth = TSC.PersonalAccessTokenAuth(token_name=token_name, personal_access_token=token_value, site_id=site_id)
+
+        # Connect to the Tableau Server
+        server = TSC.Server(server_url, use_server_version=True)
+
+        with server.auth.sign_in_with_personal_access_token(personal_access_token_auth):
+            print("Authentication successful!")
+            
+            # Find the project ID by name
+            all_projects, _ = server.projects.get()
+            project_id = None
+            for project in all_projects:
+                if project.name == project_name:
+                    project_id = project.id
+                    break
+
+            if project_id is None:
+                print(f"Project '{project_name}' not found.")
+                return
+
+            # List all workbooks in the specified project
+            req_option = TSC.RequestOptions()
+            req_option.filter.add(TSC.Filter(TSC.RequestOptions.Field.ProjectId, TSC.RequestOptions.Operator.Equals, project_id))
+
+            all_workbooks, _ = server.workbooks.get(req_options=req_option)
+            print(f"Workbooks in project '{project_name}':")
+            for workbook in all_workbooks:
+                print(workbook.name)
+
+    except TSC.ServerResponseError as e:
+        print(f"Server response error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+# Example usage
+server_url = 'https://your-tableau-server'  # Replace with your Tableau server URL
+site_id = 'your_site_id'  # Replace with your site ID
+token_name = 'your_token_name'  # Replace with your token name
+token_value = 'your_token_value'  # Replace with your token value
+project_name = 'Specific Project Name'  # Replace with the name of your project
+
+tableau_list_workbooks_in_project(server_url, site_id, token_name, token_value, project_name)
