@@ -45,3 +45,25 @@ engine = create_engine(connection_string)
 table_name = 'your_table_name'
 
 df.to_sql(table_name, engine, if_exists='append', index=False, method='multi', chunksize=1000)
+
+import tableauserverclient as TSC
+from requests_kerberos import HTTPKerberosAuth, OPTIONAL
+
+server_url = 'https://your-tableau-server'  # Replace with your Tableau server URL
+site_id = 'your_site_id'  # Replace with your site ID, or use '' for the default site
+
+# Set up Kerberos authentication
+kerberos_auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+
+# Set up Tableau Server connection
+server = TSC.Server(server_url, use_server_version=True)
+
+# Sign in
+with server.auth.sign_in_with_http_auth(site_id=site_id, auth=kerberos_auth):
+    # Perform your actions here
+    # Example: List all workbooks
+    all_workbooks, pagination_item = server.workbooks.get()
+    for workbook in all_workbooks:
+        print(workbook.name)
+
+# Remember to replace 'your-tableau-server' and 'your_site_id' with your actual server and site ID.
