@@ -124,3 +124,72 @@ token_value = 'your_token_value'  # Replace with your token value
 project_name = 'Specific Project Name'  # Replace with the name of your project
 
 tableau_list_workbooks_in_project(server_url, site_id, token_name, token_value, project_name)
+
+
+
+
+
+
+import requests
+import json
+
+# Tableau Server details and personal access token
+server_url = 'https://your-tableau-server'  # Replace with your Tableau server URL
+api_version = '3.13'  # Use the API version supported by your server
+site_name = 'your_site_name'  # Replace with your site name
+token_name = 'your_token_name'  # Replace with your token name
+token_value = 'your_token_value'  # Replace with your token value
+
+# Authentication endpoint
+auth_url = f"{server_url}/api/{api_version}/auth/signin"
+
+# Headers and payload for authentication
+headers = {
+    'Content-Type': 'application/json',
+}
+payload = {
+    "credentials": {
+        "personalAccessTokenName": token_name,
+        "personalAccessTokenSecret": token_value,
+        "site": {
+            "contentUrl": site_name
+        }
+    }
+}
+
+# Start a session and authenticate
+with requests.Session() as session:
+    response = session.post(auth_url, headers=headers, json=payload)
+    
+    if response.status_code != 200:
+        print("Authentication failed")
+        exit()
+
+    # Extract the token from the response
+    token = response.json()['credentials']['token']
+    headers['X-Tableau-Auth'] = token
+
+    # List all projects
+    projects_url = f"{server_url}/api/{api_version}/sites/{site_name}/projects"
+    response = session.get(projects_url, headers=headers)
+
+    if response.status_code == 200:
+        projects = response.json()['projects']['project']
+        print("Projects and IDs:")
+        for project in projects:
+            print(f"{project['name']} - ID: {project['id']}")
+    else:
+        print("Failed to retrieve projects")
+
+    # List all workbooks
+    workbooks_url = f"{server_url}/api/{api_version}/sites/{site_name}/workbooks"
+    response = session.get(workbooks_url, headers=headers)
+
+    if response.status_code == 200:
+        workbooks = response.json()['workbooks']['workbook']
+        print("\nWorkbooks:")
+        for workbook in workbooks:
+            print(workbook['name'])
+    else:
+        print("Failed to retrieve workbooks")
+
