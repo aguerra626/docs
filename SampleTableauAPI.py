@@ -297,3 +297,20 @@ except Exception as e:
 finally:
     # Always remember to sign out when you're done
     conn.sign_out()
+
+
+import tableauserverclient as TSC
+
+# ... (setup your server connection and authentication here)
+
+# Fetching all views and printing their total views count
+try:
+    with server.auth.sign_in(tableau_auth):
+        all_views = TSC.Pager(server.views.get)
+        for view in all_views:
+            # You may need to populate specific properties if they're not automatically included
+            server.views.populate_usage_statistics(view)
+            print(f"View: {view.name}, Total Views: {view.total_views_count}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
