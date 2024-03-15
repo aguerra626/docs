@@ -192,4 +192,44 @@ with requests.Session() as session:
             print(workbook['name'])
     else:
         print("Failed to retrieve workbooks")
+########################################
+########################################
+########################################
+########################################
+########################################
+import tableauserverclient as TSC
+
+# Step 1: Connect to Tableau Server using your personal access token
+tableau_auth = TSC.PersonalAccessTokenAuth(token_name='YOUR_TOKEN_NAME',
+                                           personal_access_token='YOUR_PERSONAL_ACCESS_TOKEN',
+                                           site_id='YOUR_SITE_ID')
+server = TSC.Server('https://YOUR_TABLEAU_SERVER_URL', use_server_version=True)
+
+# Step 2: Sign in to server
+with server.auth.sign_in(tableau_auth):
+    # Step 3: Check connection status
+    print(f"Connected to Tableau Server: {server.is_signed_in()}")
+
+    # Step 4: Get the project by its ID
+    project_id = 'YOUR_PROJECT_ID'
+    project = server.projects.get_by_id(project_id)
+
+    if project is None:
+        print(f"Project with ID '{project_id}' not found.")
+    else:
+        # Step 5: List all workbooks in the project
+        print(f"Workbooks in the project '{project.name}':")
+        for workbook in project.workbooks:
+            print(f"- {workbook.name}")
+
+        # Step 6: Get total view counts for each workbook and store in a dictionary
+        workbook_view_counts = {}
+        for workbook in project.workbooks:
+            total_view_count = sum(view.total_view_count for view in workbook.views)
+            workbook_view_counts[workbook.name] = total_view_count
+
+        # Step 7: Print the workbook view counts dictionary
+        print("Total view counts per workbook:")
+        for workbook_name, view_count in workbook_view_counts.items():
+            print(f"'{workbook_name}': {view_count}")
 
