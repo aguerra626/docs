@@ -256,3 +256,44 @@ projects_df = get_projects_dataframe(conn)
 
 # Always remember to sign out when you're done
 conn.sign_out()
+
+from tableau_api_lib import TableauServerConnection
+from tableau_api_lib.exceptions import PaginationError
+from tableau_api_lib.utils.querying import get_projects_dataframe
+import json
+
+# Define your connection details
+connection_details = {
+    'tableau_prod': {
+        'server': 'https://YOUR-SERVER-URL',
+        'username': 'YOUR_USERNAME',
+        'password': 'YOUR_PASSWORD',
+        'site_name': 'YOUR_SITE_NAME',  # Leave blank for default site
+        'site_url': 'YOUR_SITE_URL'  # This is part of your Tableau URL, often it's the site name
+    }
+}
+
+# Create a connection object
+conn = TableauServerConnection(**connection_details['tableau_prod'])
+
+try:
+    # Sign in to Tableau Server
+    conn.sign_in()
+
+    # Perform actions, for example, getting a list of projects
+    projects_df = get_projects_dataframe(conn)
+    print(projects_df)
+
+except PaginationError as e:
+    print("PaginationError occurred: ", e)
+    # Handle pagination-specific issues here
+
+except json.JSONDecodeError as e:
+    print("JSONDecodeError occurred: ", e)
+
+except Exception as e:
+    print("An error occurred: ", e)
+
+finally:
+    # Always remember to sign out when you're done
+    conn.sign_out()
