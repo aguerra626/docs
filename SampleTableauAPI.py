@@ -233,3 +233,26 @@ with server.auth.sign_in(tableau_auth):
         for workbook_name, view_count in workbook_view_counts.items():
             print(f"'{workbook_name}': {view_count}")
 
+from tableau_api_lib import TableauServerConnection
+from tableau_api_lib.utils.querying import get_projects_dataframe
+
+# Define your connection details
+connection_details = {
+    'server': 'https://YOUR-SERVER-URL',
+    'username': 'YOUR_USERNAME',
+    'password': 'YOUR_PASSWORD',
+    'site_name': 'YOUR_SITE_NAME',  # Leave blank for default site
+    'site_url': 'YOUR_SITE_URL'  # This is part of your Tableau URL, often it's the site name
+}
+
+# Create a connection object
+conn = TableauServerConnection(**connection_details)
+
+# Sign in to Tableau Server
+conn.sign_in()
+
+# Now you can perform various actions, for example, getting a list of projects
+projects_df = get_projects_dataframe(conn)
+
+# Always remember to sign out when you're done
+conn.sign_out()
