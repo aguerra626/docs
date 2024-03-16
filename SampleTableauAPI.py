@@ -313,4 +313,21 @@ try:
             print(f"View: {view.name}, Total Views: {view.total_views_count}")
 except Exception as e:
     print(f"An error occurred: {e}")
+    
+import pandas as pd
+from datetime import datetime
+
+# Sample DataFrame (replace this with your actual DataFrame)
+df = pd.DataFrame({
+    'Column1': [1, 2, 3],
+    'Column2': ['A', 'B', 'C']
+})
+
+# Get the current date and time
+current_time = datetime.now().strftime("%m-%d-%Y")
+
+# Add the new column to the DataFrame
+df['data update time'] = current_time
+
+print(df)
 
